@@ -10,11 +10,42 @@ class WorldMapPhotoExplorer {
         this.photoGallery = document.getElementById('photoGallery');
         this.photoCounter = document.getElementById('photoCounter');
         
-        // Remove image overlay elements temporarily
-        // this.imageOverlay = document.getElementById('imageOverlay');
-        // this.overlayImage = document.getElementById('overlayImage');
-        // this.overlayTitle = document.getElementById('overlayTitle');
-        // this.overlayDescription = document.getElementById('overlayDescription');
+        // Photo overlay elements
+        this.photoOverlay = document.getElementById('photoOverlay');
+        this.enlargedPhoto = document.getElementById('enlargedPhoto');
+        this.overlayTitle = document.getElementById('overlayTitle');
+        this.overlayDescription = document.getElementById('overlayDescription');
+        
+        this.init();
+    }
+
+    openPhotoOverlay(photoUrl, title, description) {
+        // Set the enlarged photo content
+        this.enlargedPhoto.src = photoUrl;
+        this.overlayTitle.textContent = title;
+        this.overlayDescription.textContent = description;
+        
+        // Show the overlay
+        this.photoOverlay.style.display = 'block';
+        setTimeout(() => {
+            this.photoOverlay.classList.add('show');
+        }, 10);
+    }
+
+    closePhotoOverlay() {
+        this.photoOverlay.classList.remove('show');
+        setTimeout(() => {
+            this.photoOverlay.style.display = 'none';
+        }, 300);
+    }
+
+    init() {
+        
+        // Photo overlay elements
+        this.photoOverlay = document.getElementById('photoOverlay');
+        this.enlargedPhoto = document.getElementById('enlargedPhoto');
+        this.overlayTitle = document.getElementById('overlayTitle');
+        this.overlayDescription = document.getElementById('overlayDescription');
         
         this.init();
     }
@@ -374,7 +405,7 @@ class WorldMapPhotoExplorer {
         // OPTIMIZED: Build HTML more efficiently
         const photoHTML = [
             '<div class="photo-container">',
-            `<img src="${photo.url}" alt="${photo.title}" class="gallery-image" loading="lazy">`,
+            `<img src="${photo.url}" alt="${photo.title}" class="gallery-image clickable-image" onclick="worldMapApp.openPhotoOverlay('${photo.url}', '${photo.title}', '${photo.description}')" loading="lazy">`,
             '<div class="photo-info">',
             `<h3>${photo.title}</h3>`,
             `<p>${photo.description}</p>`,
@@ -419,6 +450,26 @@ class WorldMapPhotoExplorer {
             this.currentPhotos = [];
             this.currentPhotoIndex = 0;
             this.currentCountryDate = null;
+        }, 300);
+    }
+
+    openPhotoOverlay(photoUrl, title, description) {
+        // Set the enlarged photo content
+        this.enlargedPhoto.src = photoUrl;
+        this.overlayTitle.textContent = title;
+        this.overlayDescription.textContent = description;
+        
+        // Show the overlay
+        this.photoOverlay.style.display = 'block';
+        setTimeout(() => {
+            this.photoOverlay.classList.add('show');
+        }, 10);
+    }
+
+    closePhotoOverlay() {
+        this.photoOverlay.classList.remove('show');
+        setTimeout(() => {
+            this.photoOverlay.style.display = 'none';
         }, 300);
     }
 
@@ -480,9 +531,26 @@ class WorldMapPhotoExplorer {
             this.nextPhoto();
         });
 
+        // Photo overlay event listeners
+        document.querySelector('.overlay-close').addEventListener('click', () => {
+            this.closePhotoOverlay();
+        });
+
+        this.photoOverlay.addEventListener('click', (e) => {
+            if (e.target === this.photoOverlay) {
+                this.closePhotoOverlay();
+            }
+        });
+
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            if (this.modal.style.display === 'block') {
+            if (this.photoOverlay.style.display === 'block') {
+                // Handle overlay keyboard events
+                if (e.key === 'Escape') {
+                    this.closePhotoOverlay();
+                }
+            } else if (this.modal.style.display === 'block') {
+                // Handle modal keyboard events
                 switch(e.key) {
                     case 'Escape':
                         this.closeModal();
@@ -501,5 +569,5 @@ class WorldMapPhotoExplorer {
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new WorldMapPhotoExplorer();
+    window.worldMapApp = new WorldMapPhotoExplorer();
 });
