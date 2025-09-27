@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Map Test</title>
+    <style>
+        #chartdiv {
+            width: 100%;
+            height: 500px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Minimal amCharts Test</h1>
+    <p>Testing if amCharts itself is causing PC freezing...</p>
+    <div id="chartdiv"></div>
+    
+    <script>
+        console.log('🧪 MINIMAL TEST START:', new Date().toISOString());
+        console.time('Total Test Time');
+        
+        // Test without amCharts first
+        setTimeout(() => {
+            console.log('✅ Basic JavaScript working fine');
+            
+            // Now test with amCharts
+            loadAmCharts();
+        }, 1000);
+        
+        function loadAmCharts() {
+            console.log('📊 Loading amCharts...');
+            
+            // Load amCharts scripts dynamically
+            const scripts = [
+                'https://cdn.amcharts.com/lib/4/core.js',
+                'https://cdn.amcharts.com/lib/4/maps.js',
+                'https://cdn.amcharts.com/lib/4/geodata/worldLow.js'
+            ];
+            
+            loadScriptsSequentially(scripts, createMinimalMap);
+        }
+        
+        function loadScriptsSequentially(scripts, callback) {
+            if (scripts.length === 0) {
+                callback();
+                return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = scripts[0];
+            script.onload = () => {
+                console.log('✅ Loaded:', scripts[0]);
+                loadScriptsSequentially(scripts.slice(1), callback);
+            };
+            script.onerror = () => {
+                console.error('❌ Failed to load:', scripts[0]);
+            };
+            document.head.appendChild(script);
+        }
+        
+        function createMinimalMap() {
+            console.log('🗺️ Creating minimal map...');
+            
+            try {
+                // Disable animations completely
+                am4core.options.animationsEnabled = false;
+                am4core.options.autoSetClassName = false;
+                
+                // Create the simplest possible map
+                const chart = am4core.create("chartdiv", am4maps.MapChart);
+                
+                // Use minimal geodata - just 3 countries for testing
+                const minimalGeodata = {
+                    type: "FeatureCollection",
+                    features: am4geodata_worldLow.features.slice(0, 3) // Only first 3 countries
+                };
+                
+                chart.geodata = minimalGeodata;
+                chart.projection = new am4maps.projections.Miller();
+                
+                const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+                polygonSeries.useGeodata = true;
+                
+                console.log('✅ Minimal map created successfully');
+                console.timeEnd('Total Test Time');
+                
+            } catch (error) {
+                console.error('❌ Error creating map:', error);
+            }
+        }
+    </script>
+</body>
+</html>

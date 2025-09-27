@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive World Map - Photo Explorer</title>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐒 The Baboon Tedventures 🐒</h1>
+            <p>Click on any country to see you soon baboon.</p>
+        </header>
+        
+        <main>
+            <!-- Map Container -->
+            <div id="chartdiv" class="map-container"></div>
+            
+            <!-- Zoom Controls (positioned over map) -->
+            <div class="zoom-controls">
+                <button id="zoomInBtn" class="zoom-btn" title="Zoom In">
+                    <span>+</span>
+                </button>
+                <button id="zoomOutBtn" class="zoom-btn" title="Zoom Out">
+                    <span>−</span>
+                </button>
+                <button id="resetZoomBtn" class="zoom-btn reset-btn" title="Reset Zoom">
+                    <span>🌍</span>
+                </button>
+            </div>
+            
+            <!-- Loading Spinner -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading world map...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Photo Gallery Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Country Photos</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="photoGallery" class="photo-gallery">
+                    <!-- Photos will be inserted here -->
+                </div>
+                <div class="gallery-navigation">
+                    <button id="prevBtn" class="nav-btn">‹ Previous</button>
+                    <span id="photoCounter" class="photo-counter">1 / 1</span>
+                    <button id="nextBtn" class="nav-btn">Next ›</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- amCharts Scripts -->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

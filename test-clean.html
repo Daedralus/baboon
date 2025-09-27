@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean Test - Travel Photo Map</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐒 CLEAN TEST - The Baboon Tedventures 🐒</h1>
+            <p>Testing without console logging and image preloading</p>
+        </header>
+        
+        <main>
+            <!-- Map Container -->
+            <div id="chartdiv" class="map-container"></div>
+            
+            <!-- Zoom Controls -->
+            <div class="zoom-controls">
+                <button class="zoom-in" title="Zoom In">+</button>
+                <button class="zoom-out" title="Zoom Out">-</button>
+                <button class="zoom-reset" title="Reset Zoom">⌂</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Photo Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="photoGallery" class="photo-gallery"></div>
+            <div class="modal-controls">
+                <button id="prevBtn">❮ Previous</button>
+                <span id="photoCounter" class="photo-counter"></span>
+                <button id="nextBtn">Next ❯</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- amCharts Scripts -->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="data.js"></script>
+    <script src="script-clean.js"></script>
+</body>
+</html>

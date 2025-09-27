@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No amCharts Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-box { 
+            width: 100%; 
+            height: 400px; 
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 FUNDAMENTAL TEST - NO amCharts</h1>
+    <p>If this freezes your PC, the issue is NOT amCharts!</p>
+    
+    <div class="test-box">
+        <div>
+            <h2>✅ Basic HTML/CSS Working</h2>
+            <p>No JavaScript libraries loaded</p>
+            <button onclick="testClick()">Test Click</button>
+        </div>
+    </div>
+
+    <script>
+        console.log('✅ Basic JavaScript working');
+        
+        function testClick() {
+            alert('✅ Click handling works!');
+            console.log('✅ Button clicked at:', new Date().toISOString());
+        }
+        
+        // Test our photo data loading
+        console.log('📊 Testing data.js loading...');
+    </script>
+    
+    <!-- Only load our data, NO amCharts -->
+    <script src="data.js"></script>
+    
+    <script>
+        console.log('📊 Photo data loaded:', Object.keys(photoData).length, 'countries');
+        console.log('📊 Sample data:', photoData.US ? 'US data exists' : 'US data missing');
+    </script>
+</body>
+</html>
