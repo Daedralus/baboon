@@ -80,6 +80,9 @@ main {
     color: #2196F3;
     transition: all 0.3s ease;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    /* Enhanced touch targets */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(33, 150, 243, 0.3);
 }
 
 .zoom-btn:hover {
@@ -336,13 +339,13 @@ main {
     }
     
     .zoom-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
+        width: 45px;  /* Increased for better mobile touch */
+        height: 45px; /* Increased for better mobile touch */
+        font-size: 18px;
     }
     
     .zoom-btn.reset-btn {
-        font-size: 14px;
+        font-size: 16px;
     }
     
     .modal-content {

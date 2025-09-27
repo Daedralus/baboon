@@ -17,6 +17,24 @@ const photoData = {
                 title: "Chairlift & Snow",
                 description: "Natural Cocaine fresh from the sky.",
                 location: "Swiss Alps"
+            },
+            {
+                url: "photos/CH/TedzAir.jpg",
+                title: "Tedz Air",
+                description: "Flying with the most talented pilot to ever exist.",
+                location: "Above the Swiss Alps"
+            },
+            {
+                url: "photos/CH/cheeseQ.jpg",
+                title: "Cheese?",
+                description: "I think someone said cheese is on board?",
+                location: "Cheese Mountains"
+            },
+            {
+                url: "photos/CH/cheeseE.jpg",
+                title: "Cheese!",
+                description: "CHEEEEESEE",
+                location: "Cheese Mountains"
             }
         ]
     },

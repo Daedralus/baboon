@@ -230,15 +230,15 @@ class WorldMapPhotoExplorer {
         
         console.timeEnd('Country Coloring Setup');
 
-        // Configure map interaction - MINIMAL PERFORMANCE IMPACT
+        // Configure map interaction - ENHANCED ZOOM FOR MOBILE
         console.time('Map Interaction Setup');
         this.chart.seriesContainer.draggable = true;
         this.chart.seriesContainer.resizable = false;
-        this.chart.maxZoomLevel = 4; // Reduce max zoom to improve performance
+        this.chart.maxZoomLevel = 10; // Increased for small countries like Maldives
         this.chart.minZoomLevel = 1;
         
-        // PERFORMANCE: Disable mouse wheel zoom as it can cause lag
-        this.chart.seriesContainer.wheelable = false;
+        // Enable mouse wheel zoom for better navigation to small countries
+        this.chart.seriesContainer.wheelable = true;
         console.timeEnd('Map Interaction Setup');
         console.log('🗺️  CreateMap - Map interaction configured:', new Date().toISOString());
 
@@ -256,6 +256,14 @@ class WorldMapPhotoExplorer {
         const countryId = country.id;
         
         console.log(`Clicked on: ${countryName} (${countryId})`);
+        
+        // Auto-zoom to small countries for better visibility (especially on mobile)
+        const smallCountries = ['MV', 'MT', 'SG', 'BH', 'BB', 'LI', 'SM', 'AD', 'MC', 'VA'];
+        if (smallCountries.includes(countryId)) {
+            // Find the clicked polygon and zoom to it
+            this.chart.seriesContainer.zoomToMapObject = country;
+            this.chart.zoomLevel = 6; // Good zoom level for small countries
+        }
         
         // Get photos for this country
         const photos = this.getCountryPhotos(countryId, countryName);
