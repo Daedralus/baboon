@@ -91,7 +91,7 @@ class WorldMapPhotoExplorer {
             })
         };
         
-        console.log('🌍 Filtered geodata:', filteredGeodata.features.length, 'countries instead of', originalGeodata.features.length);
+        console.log('🌍 Using full world geodata: all countries visible');
         return filteredGeodata;
     }
 
@@ -99,7 +99,7 @@ class WorldMapPhotoExplorer {
         // Show loading indicator
         this.showLoadingMessage('Initializing world map...');
         
-        // PERFORMANCE: Get only countries with photos
+        // PERFORMANCE: Get countries with photos for coloring
         const countriesWithPhotos = this.getCountriesWithPhotos();
         
         // PERFORMANCE: Completely disable amCharts animations
@@ -109,10 +109,8 @@ class WorldMapPhotoExplorer {
         // Create map instance with minimal config
         this.chart = am4core.create("chartdiv", am4maps.MapChart);
         
-        // PERFORMANCE: Filter geodata to only countries with photos
-        const filteredGeodata = this.filterGeodataForPhotos(am4geodata_worldLow);
-        
-        this.chart.geodata = filteredGeodata;
+        // Use FULL world geodata (not filtered)
+        this.chart.geodata = am4geodata_worldLow;
         
         this.chart.projection = new am4maps.projections.Miller();
         console.log('🗺️  CreateMap - Projection set:', new Date().toISOString());
@@ -171,17 +169,23 @@ class WorldMapPhotoExplorer {
             console.log('🎨 Country coloring READY event triggered:', new Date().toISOString());
             console.time('Country Coloring Process');
             
-            // Since we only load countries with photos, all should be colored green
+            // Set up colors for countries with and without photos
             const hasPhotosColor = am4core.color("#4CAF50");
+            const noPhotosColor = am4core.color("#e6f3ff");
             
-            // OPTIMIZED: Only process countries that have photos (12 instead of 257)
+            // Process all countries but color differently based on photos
             let processedCount = 0;
             polygonSeries.mapPolygons.each((polygon) => {
                 const country = polygon.dataItem.dataContext;
+                const hasPhotos = this.hasCountryPhotos(country.id, country.name);
                 
-                // All countries in this filtered set have photos
-                polygon.fill = hasPhotosColor;
-                polygon.tooltipText = "{name}";
+                if (hasPhotos) {
+                    polygon.fill = hasPhotosColor;
+                    polygon.tooltipText = "{name}";
+                } else {
+                    polygon.fill = noPhotosColor;
+                    polygon.tooltipText = "{name} (No photos yet)";
+                }
                 
                 processedCount++;
             });
