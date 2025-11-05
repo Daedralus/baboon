@@ -95,6 +95,19 @@ const photoData = {
         ]
     },
 
+    // France (Paris) 🇫🇷
+    "FR": {
+        date: "November 2025",
+        photos: [
+            {
+                url: "photos/paris/Path1.png",
+                title: "Croissant Class Route",
+                description: "Navigation to 25 Rue de Bretagne for morning pastry mastery",
+                location: "Marais District, Paris"
+            }
+        ]
+    },
+
     // Czech Republic (Prague) 🇨🇿
     "CZ": {
         date: "June 2025",
