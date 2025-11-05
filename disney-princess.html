@@ -21,6 +21,49 @@
   .controls{ display:flex; gap:8px; justify-content:center; padding:12px; }
   button{ background:#fff; border:1px solid #eee; padding:10px 14px; border-radius:9px; font-weight:600; cursor:pointer }
   button.primary{ background:var(--accent); color:white; border:none }
+  
+  /* Mobile optimizations */
+  @media (max-width: 480px) {
+    body { padding: 12px; }
+    .frame { max-width: 100%; }
+    
+    #map {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+      aspect-ratio: 3/4; /* Consistent aspect ratio for Google Maps screenshots */
+      background: #f8f8f8; /* Light background for better contrast */
+      border: 1px solid #e0e0e0; /* Subtle border to contain the image */
+    }
+    
+    .photo-indicator {
+      font-size: 0.75rem;
+      padding: 3px 6px;
+      top: 8px;
+      right: 8px;
+    }
+    
+    .controls {
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px 12px;
+    }
+    
+    button {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 375px) {
+    .frame { margin: 0; }
+    
+    #map {
+      max-height: 300px; /* Prevent photos from being too tall on small screens */
+    }
+  }
 
 </style>
 </head>
