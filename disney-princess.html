@@ -19,10 +19,33 @@
   .card.show{ opacity:1; transform:none; }
   .card.current{ border-left:3px solid var(--accent); }
   .card.previous{ opacity:0.6; background:rgba(255,255,255,0.4); }
-  .stage-title{ font-weight:600; margin-bottom:6px; }
+  .stage-title{ font-weight:600; margin-bottom:6px; cursor:pointer; }
+  .stage-title:hover{ color:var(--accent); }
   .small{ font-size:0.92rem; color:#444 }
   #intro .stage-title{ cursor:pointer; user-select:none; transition: all 300ms ease; }
   .controls{ display:flex; gap:8px; justify-content:center; padding:12px; }
+  
+  /* Modal popup */
+  .modal{ display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; }
+  .modal.show{ display:flex; }
+  .modal-content{ background:white; border-radius:16px; padding:24px; max-width:400px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+  .modal-header{ font-size:1.3rem; font-weight:700; margin-bottom:12px; color:var(--accent); }
+  .modal-body{ font-size:0.95rem; line-height:1.6; margin-bottom:16px; }
+  .modal-links{ margin-top:16px; }
+  .modal-link{ display:block; padding:10px 16px; background:#f0f0f0; border-radius:8px; margin:8px 0; text-decoration:none; color:#333; font-weight:600; text-align:center; }
+  .modal-link:hover{ background:#e0e0e0; }
+  .modal-image{ width:100%; max-width:100%; border-radius:8px; margin:12px 0; cursor:pointer; transition:transform 0.2s; }
+  .modal-image:hover{ transform:scale(1.02); }
+  .modal-image-btn{ display:block; padding:10px 16px; background:var(--accent); color:white; border-radius:8px; margin:8px 0; text-align:center; font-weight:600; cursor:pointer; border:none; width:100%; }
+  .modal-image-btn:hover{ opacity:0.9; }
+  .modal-close{ background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:8px; width:100%; font-weight:600; cursor:pointer; margin-top:12px; }
+  
+  /* Image popup overlay */
+  .image-overlay{ display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
+  .image-overlay.show{ display:flex; }
+  .image-overlay img{ max-width:90%; max-height:90%; object-fit:contain; border-radius:8px; }
+  .image-overlay-close{ position:absolute; top:20px; right:30px; color:white; font-size:40px; font-weight:bold; cursor:pointer; background:rgba(0,0,0,0.5); border-radius:50%; width:50px; height:50px; display:flex; align-items:center; justify-content:center; }
+  
   button{ background:#fff; border:1px solid #eee; padding:10px 14px; border-radius:9px; font-weight:600; cursor:pointer }
   button.primary{ background:var(--accent); color:white; border:none }
   
@@ -135,7 +158,7 @@
   <div class="frame" role="main">
     <div class="map-wrap">
       <div class="image-container">
-        <img id="map" src="photos/CH/cheeseE.jpg" alt="Paris travel path map">
+        <img id="map" src="photos/paris/cheeseF.jpg" alt="Paris travel path map">
         <div class="photo-indicator" id="photoIndicator">Path 1/8</div>
       </div>
     </div>
@@ -147,25 +170,121 @@
       </div>
     </div>
 
-    <!-- 
+<!--
     <div class="controls">
       <button id="manualBtn">Reveal Next</button>
       <button id="testBtn">Show All (test)</button>
     </div>
-    -->
+-->
+  </div>
+
+  <!-- Modal for stage details -->
+  <div class="modal" id="stageModal">
+    <div class="modal-content">
+      <div class="modal-header" id="modalTitle"></div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-links" id="modalLinks"></div>
+      <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Image overlay popup -->
+  <div class="image-overlay" id="imageOverlay" onclick="closeImageOverlay()">
+    <span class="image-overlay-close">&times;</span>
+    <img id="overlayImage" src="" alt="Ticket">
   </div>
 
 <script>
 // Stage data (Paris local times) - ISO with CET offset (+01:00)
 const stages = [
-  { time: '2025-11-08T10:30:00+01:00', title: 'Croissant Class', note:'10:30 — 12:30', photo: 'Path1.png' },
-  { time: '2025-11-08T12:30:00+01:00', title: 'Marais Mini-stroll & Coffee', note:'12:30 — 13:05', photo: 'Path2.png' },
-  { time: '2025-11-08T13:30:00+01:00', title: 'Musée Vivant du Fromage — Île Saint-Louis', note:'13:30 — 15:00', photo: 'Path3.png' },
-  { time: '2025-11-08T15:00:00+01:00', title: 'Notre Dame Walk', note:'15:00 — 15:45', photo: 'Path4.png' },
-  { time: '2025-11-08T15:40:00+01:00', title: 'To The Boat!', note:'15:45-16:30', photo: 'Path4.png' },
-  { time: '2025-11-08T16:30:00+01:00', title: 'Eiffel Arrival — Golden Hour + Shopping', note:'16:30-19:00', photo: 'Path5.png' },
-  { time: '2025-11-08T19:00:00+01:00', title: 'Dinner at Le Petit Cler', note:'19:00-21:00', photo: 'Path6.png' },
-  { time: '2025-11-08T21:00:00+01:00', title: 'End of Day', note:'21:00-00:00', photo: 'Path7.png' }
+  { 
+    time: '2025-11-08T10:30:00+01:00', 
+    title: 'Croissant Class', 
+    note:'10:30 — 12:30', 
+    photo: 'Path1.png',
+    details: 'Learn to make authentic French croissants with a local pastry chef at a cozy bakery in Le Marais.',
+    links: [
+      { text: 'View Location on Maps', url: 'https://maps.google.com/?q=25+Rue+de+Bretagne+Paris' },
+      { text: 'Class Information', url: 'https://www.getyourguide.com/en-au/paris-l16/paris-baking-insider-experience-t649804/?ranking_uuid=47883e7b-da39-46d1-9ce0-86e488ddcb4e' }
+    ]
+  },
+  { 
+    time: '2025-11-08T12:30:00+01:00', 
+    title: 'Marché couvert des Enfants Rouges', 
+    note:'12:30 — 13:05', 
+    photo: 'Path2.png',
+    details: 'Explore the oldest covered market in Paris, offering a variety of international food stalls and fresh produce.',
+    links: [
+      { text: 'View Location on Maps', url: 'https://www.google.com/maps/place/Marché+couvert+des+Enfants+Rouges/@48.8479961,2.3208634,14z/data=!4m6!3m5!1s0x47e66e0683f48c17:0x8cf0914d1194139b!8m2!3d48.8628656!4d2.3620448!16s%2Fg%2F11gjwg4t_g?entry=ttu&g_ep=EgoyMDI1MTEwMi4wIKXMDSoASAFQAw%3D%3D' },
+      { text: 'Oldest Covered Market of Paris', url: 'https://www.parisinsidersguide.com/marche-des-enfants-rouges-paris.html' }
+    ]
+  },
+  { 
+    time: '2025-11-08T13:30:00+01:00', 
+    title: 'Musée Vivant du Fromage — Île Saint-Louis', 
+    note:'13:30 — 15:00', 
+    photo: 'Path3.png',
+    details: 'Discover the art of French cheese-making at this interactive cheese museum.',
+    links: [
+      { text: 'View Location on Maps', url: 'https://maps.app.goo.gl/rJvfh7opnda9oJmo6' },
+      { text: 'Museum Website', url: 'https://musee-fromage-paris.com/en' }
+    ],
+    image: 'photos/paris/cheese.png'
+  },
+  { 
+    time: '2025-11-08T15:00:00+01:00', 
+    title: 'Notre Dame Stroll', 
+    note:'15:00 — 15:45', 
+    photo: 'Path4.png',
+    details: 'Stroll around the historic Notre Dame cathedral and the surrounding area.',
+    links: [
+      { text: 'View Location on Maps', url: 'https://maps.app.goo.gl/kqaUUwQWjMwZgmiU9' },
+      { text: 'Notre Dame Info', url: 'https://www.notredamedeparis.fr/en/' }
+    ]
+  },
+  { 
+    time: '2025-11-08T15:40:00+01:00', 
+    title: 'To The Boat!', 
+    note:'15:45-16:30', 
+    photo: 'Path4.png',
+    details: 'Walk to the Seine and board the Batobus for a scenic river cruise to the Eiffel Tower.',
+    links: [
+      { text: 'Batobus Information', url: 'https://www.batobus.com/en' },
+      { text: 'Our Port', url: 'https://maps.app.goo.gl/pjntZLaPcqgvqRYy7' }
+    ]
+  },
+  { 
+    time: '2025-11-08T16:30:00+01:00', 
+    title: 'Eiffel Arrival — Golden Hour + Shopping', 
+    note:'16:30-19:00', 
+    photo: 'Path5.png',
+    details: 'Arrive at the Eiffel Tower during golden hour for stunning photos and explore nearby shops.',
+    links: [
+      { text: 'Eiffel Tower Info', url: 'https://www.toureiffel.paris/en' },
+      { text: 'Shopping Area', url: 'https://maps.app.goo.gl/khRS43aNQXkwcD33A' }
+    ]
+  },
+  { 
+    time: '2025-11-08T19:00:00+01:00', 
+    title: 'Dinner at Le Petit Cler', 
+    note:'19:00-21:00', 
+    photo: 'Path6.png',
+    details: 'Enjoy a traditional French dinner at this charming bistro near the Eiffel Tower.',
+    links: [
+      { text: 'View Location on Maps', url: 'https://maps.app.goo.gl/itbjJQdGrtCvNiVr9' },
+      { text: 'Restaurant Website', url: 'https://menuonline.fr/en/lepetitcler' }
+    ]
+  },
+  { 
+    time: '2025-11-08T21:00:00+01:00', 
+    title: 'End of Day', 
+    note:'21:00-00:00', 
+    photo: 'Path7.png',
+    details: 'Return to the hotel and relax after amazing Paris Tedventure-Date.',
+    links: [
+      { text: 'Initiate Sexy Time', url: 'https://maps.app.goo.gl/YHYFRqSgAnMYj6km6' }
+    ]
+  }
 ];
 
 let revealed = -1;
@@ -176,7 +295,7 @@ const mapImg = document.getElementById('map');
 const photoIndicator = document.getElementById('photoIndicator');
 
 // Initialize with first photo
-mapImg.src = 'photos/CH/cheeseE.jpg';
+mapImg.src = 'photos/paris/cheeseF.jpg';
 mapImg.alt = 'Croissant class - Travel path map';
 photoIndicator.textContent = 'Path 1/8';
 
@@ -199,9 +318,15 @@ function createCard(stageIndex){
   const s = stages[stageIndex];
   const card = document.createElement('div');
   card.className='card show current';
-  const title = document.createElement('div'); title.className='stage-title'; title.textContent = s.title;
-  const note = document.createElement('div'); note.className='small'; note.textContent = s.note;
-  card.appendChild(title); card.appendChild(note);
+  const title = document.createElement('div'); 
+  title.className='stage-title'; 
+  title.textContent = s.title;
+  title.onclick = () => openModal(stageIndex);
+  const note = document.createElement('div'); 
+  note.className='small'; 
+  note.textContent = s.note;
+  card.appendChild(title); 
+  card.appendChild(note);
   
   // Gray out all existing stage cards
   document.querySelectorAll('.card.current').forEach(c => {
@@ -218,6 +343,51 @@ function createCard(stageIndex){
   
   // Update map photo to current stage
   updateMapPhoto(stageIndex);
+}
+
+function openModal(stageIndex) {
+  const s = stages[stageIndex];
+  document.getElementById('modalTitle').textContent = s.title;
+  document.getElementById('modalBody').textContent = s.details || s.note;
+  
+  const linksContainer = document.getElementById('modalLinks');
+  linksContainer.innerHTML = '';
+  
+  // Add image button if exists
+  if (s.image) {
+    const btn = document.createElement('button');
+    btn.className = 'modal-image-btn';
+    btn.textContent = '🎫 View Tickets';
+    btn.onclick = () => openImageOverlay(s.image);
+    linksContainer.appendChild(btn);
+  }
+  
+  // Add links if exists
+  if (s.links && s.links.length > 0) {
+    s.links.forEach(link => {
+      const a = document.createElement('a');
+      a.className = 'modal-link';
+      a.href = link.url;
+      a.textContent = link.text;
+      a.target = '_blank';
+      linksContainer.appendChild(a);
+    });
+  }
+  
+  document.getElementById('stageModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('stageModal').classList.remove('show');
+}
+
+function openImageOverlay(imageSrc) {
+  document.getElementById('overlayImage').src = imageSrc;
+  document.getElementById('imageOverlay').classList.add('show');
+}
+
+function closeImageOverlay() {
+  document.getElementById('imageOverlay').classList.remove('show');
 }
 
 function updateMapPhoto(stageIndex) {
@@ -280,7 +450,7 @@ function startHold(e) {
     }
     titleEl.style.opacity = '1';
     titleEl.style.transform = 'scale(1)';
-  }, 5000);
+  }, 3000);
 }
 
 function cancelHold() {
@@ -290,6 +460,22 @@ function cancelHold() {
     clearTimeout(holdTimer);
     holdTimer = null;
   }
+}
+
+// Manual button interactions
+if (manualBtn) {
+  manualBtn.addEventListener('click', () => {
+    const next = Math.min(revealed+1, stages.length-1);
+    if(next > revealed){ revealed = next; createCard(next); }
+  });
+}
+
+if (testBtn) {
+  testBtn.addEventListener('click', () => {
+    for(let i=0; i<stages.length; i++){
+      if(i>revealed){ revealed=i; createCard(i); }
+    }
+  });
 }
 
 // initial run: show intro then run auto-check every 10s
