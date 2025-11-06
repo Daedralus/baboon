@@ -142,14 +142,16 @@
     <div class="content" id="contentArea">
       <div class="card show" id="intro">
         <div class="stage-title">Paris Tedventure</div>
-        <div class="small">This page incorporates baguette magic to update in real time. I love you so much my disney princess babyboooonnn!</div>
+        <div class="small">This page incorporates baguette magic to update in real time -I hope you enjoy today lots! I love you so much my disney princess babyboooonnn! (PS: Cute detail at end)</div>
       </div>
     </div>
 
+    <!-- 
     <div class="controls">
       <button id="manualBtn">Reveal Next</button>
       <button id="testBtn">Show All (test)</button>
     </div>
+    -->
   </div>
 
 <script>
@@ -260,12 +262,44 @@ manualBtn.addEventListener('click', ()=>{
   if(next > revealed){ revealed = next; createCard(next); }
 });
 
+// Shake detection to reveal next
+let lastX = 0, lastY = 0, lastZ = 0;
+let shakeThreshold = 15;
+let lastShakeTime = 0;
+let shakeCooldown = 2000; // 2 seconds between shakes
+
+if (window.DeviceMotionEvent) {
+  window.addEventListener('devicemotion', (e) => {
+    const acc = e.accelerationIncludingGravity;
+    if (!acc) return;
+    
+    const deltaX = Math.abs(acc.x - lastX);
+    const deltaY = Math.abs(acc.y - lastY);
+    const deltaZ = Math.abs(acc.z - lastZ);
+    
+    if ((deltaX > shakeThreshold || deltaY > shakeThreshold || deltaZ > shakeThreshold)) {
+      const now = Date.now();
+      if (now - lastShakeTime > shakeCooldown) {
+        console.log('Shake detected!');
+        lastShakeTime = now;
+        manualBtn.click();
+      }
+    }
+    
+    lastX = acc.x;
+    lastY = acc.y;
+    lastZ = acc.z;
+  });
+}
+
 // test button shows all (for rehearsal)
-testBtn.addEventListener('click', ()=>{
-  for(let i=0;i<stages.length;i++){
-    if(i>revealed){ revealed=i; createCard(i); }
-  }
-});
+if (testBtn) {
+  testBtn.addEventListener('click', ()=>{
+    for(let i=0;i<stages.length;i++){
+      if(i>revealed){ revealed=i; createCard(i); }
+    }
+  });
+}
 
 // initial run: show intro then run auto-check every 10s
 checkAuto();
