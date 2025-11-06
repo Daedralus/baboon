@@ -21,6 +21,7 @@
   .card.previous{ opacity:0.6; background:rgba(255,255,255,0.4); }
   .stage-title{ font-weight:600; margin-bottom:6px; }
   .small{ font-size:0.92rem; color:#444 }
+  #intro .stage-title{ cursor:pointer; user-select:none; transition: all 300ms ease; }
   .controls{ display:flex; gap:8px; justify-content:center; padding:12px; }
   button{ background:#fff; border:1px solid #eee; padding:10px 14px; border-radius:9px; font-weight:600; cursor:pointer }
   button.primary{ background:var(--accent); color:white; border:none }
@@ -142,7 +143,7 @@
     <div class="content" id="contentArea">
       <div class="card show" id="intro">
         <div class="stage-title">Paris Tedventure</div>
-        <div class="small">This page incorporates baguette magic to update in real time -I hope you enjoy today lots! I love you so much my disney princess babyboooonnn! (PS: Cute detail at end)</div>
+        <div class="small">This page incorporates baguette magic to update in real time - I hope you enjoy today lots! I love you so much my disney princess babyboooonnn! (PS: Cute detail at end)</div>
       </div>
     </div>
 
@@ -256,57 +257,44 @@ function checkAuto(){
   }
 }
 
-// manual interaction
-manualBtn.addEventListener('click', ()=>{
-  const next = Math.min(revealed+1, stages.length-1);
-  if(next > revealed){ revealed = next; createCard(next); }
-});
+// Hold title for 5 seconds to reveal next
+let holdTimer = null;
+const titleEl = document.querySelector('#intro .stage-title');
 
-// Shake detection to reveal next
-let lastX = 0, lastY = 0, lastZ = 0;
-let shakeThreshold = 15;
-let lastShakeTime = 0;
-let shakeCooldown = 2000; // 2 seconds between shakes
+titleEl.addEventListener('touchstart', startHold);
+titleEl.addEventListener('mousedown', startHold);
+titleEl.addEventListener('touchend', cancelHold);
+titleEl.addEventListener('mouseup', cancelHold);
+titleEl.addEventListener('touchcancel', cancelHold);
+titleEl.addEventListener('mouseleave', cancelHold);
 
-if (window.DeviceMotionEvent) {
-  window.addEventListener('devicemotion', (e) => {
-    const acc = e.accelerationIncludingGravity;
-    if (!acc) return;
-    
-    const deltaX = Math.abs(acc.x - lastX);
-    const deltaY = Math.abs(acc.y - lastY);
-    const deltaZ = Math.abs(acc.z - lastZ);
-    
-    if ((deltaX > shakeThreshold || deltaY > shakeThreshold || deltaZ > shakeThreshold)) {
-      const now = Date.now();
-      if (now - lastShakeTime > shakeCooldown) {
-        console.log('Shake detected!');
-        lastShakeTime = now;
-        manualBtn.click();
-      }
+function startHold(e) {
+  e.preventDefault();
+  titleEl.style.opacity = '0.6';
+  titleEl.style.transform = 'scale(0.95)';
+  holdTimer = setTimeout(() => {
+    const next = Math.min(revealed+1, stages.length-1);
+    if(next > revealed){ 
+      revealed = next; 
+      createCard(next); 
     }
-    
-    lastX = acc.x;
-    lastY = acc.y;
-    lastZ = acc.z;
-  });
+    titleEl.style.opacity = '1';
+    titleEl.style.transform = 'scale(1)';
+  }, 5000);
 }
 
-// test button shows all (for rehearsal)
-if (testBtn) {
-  testBtn.addEventListener('click', ()=>{
-    for(let i=0;i<stages.length;i++){
-      if(i>revealed){ revealed=i; createCard(i); }
-    }
-  });
+function cancelHold() {
+  titleEl.style.opacity = '1';
+  titleEl.style.transform = 'scale(1)';
+  if (holdTimer) {
+    clearTimeout(holdTimer);
+    holdTimer = null;
+  }
 }
 
 // initial run: show intro then run auto-check every 10s
 checkAuto();
 setInterval(checkAuto, 10000);
-
-// Accessibility: allow keyboard reveal
-document.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') manualBtn.click(); });
 </script>
 </body>
 </html>
