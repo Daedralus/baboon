@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1d2a44" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Amsterdam Tedventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --cream:#f7f0e3; --cream-2:#efe4d0; --paper:#fffaf1;
+    --navy:#1d2a44; --navy-2:#2c3c5e; --ink:#1b2233; --muted:#5a6276;
+    --terra:#a94f32; --terra-soft:#f3dccf;
+    --gold:#b8892f; --gold-soft:#f4e6c6;
+    --green:#2f6b4f; --green-soft:#d9eadf;
+    --radius:16px;
+    --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--cream); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.45; }
+  a{ color:inherit; }
+  .wrap{ max-width:540px; margin:0 auto; padding:0 16px 48px; }
+
+  /* Hero with canal-house skyline */
+  .hero{ background:var(--navy); color:var(--cream); padding:calc(env(safe-area-inset-top) + 22px) 0 0; position:relative; overflow:hidden; }
+  .hero .wrap{ padding-bottom:0; }
+  .hero .eyebrow{ font-size:0.75rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold-soft); opacity:0.9; }
+  .hero h1{ font-family:var(--serif); font-weight:700; font-size:2.1rem; line-height:1.1; margin:6px 0 4px; user-select:none; -webkit-user-select:none; cursor:pointer; transition:transform .3s, opacity .3s; }
+  .hero h1 .x{ color:var(--terra); font-size:1.4rem; vertical-align:middle; letter-spacing:-0.1em; }
+  .hero p{ margin:0 0 14px; color:#d8dbe4; font-size:0.95rem; }
+  .skyline{ display:block; width:100%; height:86px; }
+  .water{ height:10px; background:repeating-linear-gradient(90deg, var(--navy-2) 0 18px, #33466b 18px 30px); }
+
+  /* Sticky bar */
+  .sticky{ position:sticky; top:0; z-index:20; background:rgba(247,240,227,0.96); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border-bottom:1px solid var(--cream-2); padding-top:env(safe-area-inset-top); }
+  .sticky .wrap{ padding-top:10px; padding-bottom:10px; }
+  .next{ display:flex; align-items:center; gap:10px; background:var(--paper); border:1px solid var(--cream-2); border-radius:12px; padding:8px 12px; min-height:48px; cursor:pointer; width:100%; text-align:left; font:inherit; color:inherit; }
+  .next .pulse{ width:10px; height:10px; border-radius:50%; background:var(--terra); flex-shrink:0; box-shadow:0 0 0 0 rgba(169,79,50,.5); animation:pulse 2s infinite; }
+  @keyframes pulse{ 70%{ box-shadow:0 0 0 8px rgba(169,79,50,0);} 100%{ box-shadow:0 0 0 0 rgba(169,79,50,0);} }
+  .next .lbl{ font-size:0.7rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); }
+  .next .what{ font-weight:600; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .next .txt{ min-width:0; flex:1; }
+  .next .when{ font-weight:700; color:var(--terra); font-size:0.9rem; white-space:nowrap; }
+  .progress{ display:flex; align-items:center; gap:10px; margin:8px 2px 10px; font-size:0.78rem; color:var(--muted); }
+  .bar{ flex:1; height:6px; background:var(--cream-2); border-radius:6px; overflow:hidden; }
+  .bar > span{ display:block; height:100%; width:0; background:linear-gradient(90deg, var(--gold), var(--terra)); transition:width .4s; }
+  .tabs{ display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--cream-2); padding:4px; border-radius:12px; }
+  .tab{ border:0; background:transparent; border-radius:9px; min-height:44px; font:600 0.95rem var(--sans); color:var(--muted); cursor:pointer; }
+  .tab small{ display:block; font-weight:500; font-size:0.72rem; }
+  .tab[aria-selected="true"]{ background:var(--navy); color:var(--cream); box-shadow:0 2px 8px rgba(29,42,68,.25); }
+
+  /* Note */
+  .note{ margin:18px 0 6px; background:var(--paper); border-radius:var(--radius); padding:16px 18px; border:1px solid var(--cream-2); position:relative; }
+  .note h2{ font-family:var(--serif); font-size:1.15rem; margin:0 0 6px; color:var(--navy); }
+  .note p{ margin:0; color:#3a4152; font-size:0.95rem; }
+  .note .sig{ margin-top:8px; font-family:var(--serif); color:var(--terra); }
+
+  /* Section headings & panels */
+  .section-title{ font-family:var(--serif); font-size:1.35rem; color:var(--navy); margin:22px 2px 4px; }
+  .section-sub{ color:var(--muted); font-size:0.88rem; margin:0 2px 12px; }
+  .panel{ background:var(--paper); border:1px solid var(--cream-2); border-radius:var(--radius); padding:14px 16px; margin:12px 0; }
+  .panel h3{ margin:0 0 8px; font-size:0.95rem; }
+  .chips{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .chip{ min-height:44px; border:1.5px solid var(--cream-2); background:#fff; border-radius:10px; font:600 0.95rem var(--sans); color:var(--navy); cursor:pointer; }
+  .chip[aria-pressed="true"]{ background:var(--terra); border-color:var(--terra); color:#fff; }
+  .plan-note{ margin:10px 0 0; font-size:0.88rem; color:#3a4152; }
+  .warn{ background:var(--terra-soft); color:#6b2c18; border-radius:12px; padding:12px 14px; font-size:0.88rem; margin:12px 0; }
+  .warn strong{ color:#5a2210; }
+  .deadline{ background:var(--navy); color:var(--cream); border-radius:var(--radius); padding:14px 16px; margin:14px 0; }
+  .deadline h3{ margin:0 0 8px; font-family:var(--serif); font-size:1.05rem; color:var(--gold-soft); }
+  .deadline ol{ margin:0; padding-left:20px; font-size:0.92rem; }
+  .deadline li{ margin:3px 0; }
+
+  /* Timeline */
+  .timeline{ position:relative; }
+  .card{ background:#fff; border-radius:var(--radius); border:1px solid var(--cream-2); box-shadow:0 4px 14px rgba(29,42,68,0.06); padding:14px 14px 14px 12px; display:grid; grid-template-columns:58px 1fr 44px; gap:10px; position:relative; transition:opacity .3s, box-shadow .3s; }
+  .card.optional{ background:#fffdf8; border-style:dashed; border-color:#d9c9a8; box-shadow:none; }
+  .card.next-up{ border:2px solid var(--terra); box-shadow:0 6px 22px rgba(169,79,50,0.18); }
+  .card.next-up::before{ content:'Up next'; position:absolute; top:-10px; left:14px; background:var(--terra); color:#fff; font-size:0.68rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 8px; border-radius:6px; }
+  .card.now::before{ content:'Happening now'; }
+  .card.done{ opacity:0.55; }
+  .card.done h3{ text-decoration:line-through; text-decoration-color:var(--gold); }
+  .time{ font-family:var(--serif); font-weight:700; color:var(--navy); font-size:1.1rem; line-height:1.15; }
+  .time small{ display:block; font-family:var(--sans); font-weight:500; font-size:0.75rem; color:var(--muted); margin-top:2px; }
+  .card h3{ margin:4px 0 2px; font-size:1.05rem; line-height:1.25; }
+  .addr{ font-size:0.82rem; color:var(--muted); margin:0 0 6px; }
+  .desc{ font-size:0.9rem; margin:0; color:#333a4a; }
+  .badge{ display:inline-block; font-size:0.68rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; padding:3px 8px; border-radius:6px; }
+  .b-confirmed{ background:var(--green-soft); color:var(--green); }
+  .b-planned{ background:var(--gold-soft); color:#7a5915; }
+  .b-optional{ background:transparent; color:var(--terra); border:1px dashed var(--terra); padding:2px 7px; }
+  .b-tentative{ background:var(--terra-soft); color:#7b311b; }
+  .b-flexible{ background:#e3e7f0; color:var(--navy-2); }
+  details{ margin-top:8px; }
+  summary{ cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--navy-2); min-height:32px; display:flex; align-items:center; list-style:none; }
+  summary::-webkit-details-marker{ display:none; }
+  summary::before{ content:'▸'; margin-right:6px; transition:transform .2s; display:inline-block; }
+  details[open] summary::before{ transform:rotate(90deg); }
+  details ul{ margin:4px 0 0; padding-left:18px; font-size:0.88rem; color:#333a4a; }
+  details li{ margin:4px 0; }
+  .actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:44px; padding:0 14px; border-radius:10px; font-weight:600; font-size:0.88rem; text-decoration:none; border:0; cursor:pointer; }
+  .btn-nav{ background:var(--navy); color:var(--cream); }
+  .btn-ghost{ background:var(--cream); color:var(--navy); border:1px solid var(--cream-2); }
+  .btn-terra{ background:var(--terra); color:#fff; }
+  .check{ display:flex; justify-content:center; padding-top:2px; }
+  .check input{ appearance:none; -webkit-appearance:none; width:32px; height:32px; border-radius:50%; border:2px solid #c9b996; background:#fff; cursor:pointer; position:relative; margin:0; }
+  .check input:checked{ background:var(--gold); border-color:var(--gold); }
+  .check input:checked::after{ content:''; position:absolute; left:10px; top:5px; width:7px; height:14px; border:solid #fff; border-width:0 3px 3px 0; transform:rotate(45deg); }
+  .check input:focus-visible, .btn:focus-visible, .tab:focus-visible, .chip:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+
+  /* Walk connectors */
+  .walk{ display:flex; align-items:center; gap:10px; padding:4px 0 4px 36px; position:relative; min-height:58px; }
+  .walk::before{ content:''; position:absolute; left:40px; top:0; bottom:0; border-left:3px dotted var(--navy-2); opacity:.35; }
+  .walk.opt::before{ border-left-color:var(--terra); }
+  .walk .icon{ position:relative; z-index:1; width:26px; height:26px; border-radius:50%; background:var(--cream); border:2px solid var(--navy-2); display:flex; align-items:center; justify-content:center; font-size:0.8rem; margin-left:-9px; }
+  .walk .info{ flex:1; font-size:0.84rem; color:var(--muted); }
+  .walk .info b{ color:var(--ink); font-weight:600; }
+  .walk a{ font-size:0.82rem; font-weight:600; color:var(--navy); text-decoration:none; border:1px solid var(--cream-2); background:var(--paper); border-radius:10px; padding:0 12px; min-height:40px; display:inline-flex; align-items:center; white-space:nowrap; }
+
+  .ideas{ display:grid; gap:8px; margin-top:8px; }
+  .idea{ background:var(--cream); border-radius:10px; padding:10px 12px; font-size:0.88rem; }
+  .idea b{ display:block; color:var(--navy); }
+
+  .surprise{ text-align:center; background:linear-gradient(160deg, var(--navy), var(--navy-2)); color:var(--cream); border-radius:var(--radius); padding:22px 18px; margin:20px 0 0; cursor:pointer; }
+  .surprise h3{ font-family:var(--serif); margin:6px 0; color:var(--gold-soft); }
+  .surprise p{ margin:6px 0 0; font-size:0.95rem; }
+  .surprise .msg{ display:none; }
+  .surprise.open .msg{ display:block; }
+  .surprise.open .lock{ display:none; }
+
+  .footer-tools{ display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+  .foot{ text-align:center; color:var(--muted); font-size:0.78rem; margin-top:26px; }
+  .toast{ position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(80px); background:var(--navy); color:var(--cream); padding:10px 16px; border-radius:12px; font-size:0.9rem; z-index:50; transition:transform .3s; max-width:90vw; text-align:center; }
+  .toast.show{ transform:translateX(-50%) translateY(0); }
+  .day[hidden]{ display:none; }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">3 – 4 November 2026</div>
+    <h1 id="title">Amsterdam <span class="x">✕✕✕</span> Tedventure</h1>
+    <p>Canals, stroopwafels &amp; us · Europe/Amsterdam time</p>
+  </div>
+  <svg class="skyline" id="skyline" viewBox="0 0 400 86" preserveAspectRatio="none" aria-hidden="true"></svg>
+  <div class="water"></div>
+</header>
+
+<div class="sticky">
+  <div class="wrap">
+    <button class="next" id="nextBox" type="button" aria-live="polite">
+      <span class="pulse" aria-hidden="true"></span>
+      <span class="txt"><span class="lbl" id="nextLbl">Next up</span><span class="what" id="nextWhat">…</span></span>
+      <span class="when" id="nextWhen"></span>
+    </button>
+    <div class="progress"><span id="progTxt">0/0 done</span><div class="bar"><span id="progBar"></span></div></div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-tue" aria-controls="day-tue" aria-selected="true">Tuesday<small>3 Nov · Explore</small></button>
+      <button class="tab" role="tab" id="tab-wed" aria-controls="day-wed" aria-selected="false">Wednesday<small>4 Nov · Fly home</small></button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="note">
+    <h2>Hi babyboooonnn ❤</h2>
+    <p>Welcome to our little Amsterdam companion. Same baguette magic as Paris, now with stroopwafel magic: it follows Amsterdam time and always shows what's next. Tick things off as we go, wander wherever looks cute, and no rushing (except for the plane). I love you so much, my Disney princess!</p>
+    <div class="sig">— your Ted</div>
+  </section>
+
+  <!-- TUESDAY -->
+  <section class="day" id="day-tue" role="tabpanel" aria-labelledby="tab-tue">
+    <h2 class="section-title">Tuesday · Explore &amp; stroopwafels</h2>
+    <p class="section-sub">Flexible afternoon, then three fixed points: workshop 16:15, dinner 17:30, Anne Frank House 19:00.</p>
+
+    <div class="panel">
+      <h3>When do we reach the hotel?</h3>
+      <div class="chips" id="arrivalChips"></div>
+      <p class="plan-note" id="planNote"></p>
+    </div>
+
+    <div class="timeline" id="tl-tue"></div>
+
+    <div class="footer-tools">
+      <a class="btn btn-nav" id="fullRouteTue" target="_blank" rel="noopener">🗺 Full Tuesday route</a>
+    </div>
+  </section>
+
+  <!-- WEDNESDAY -->
+  <section class="day" id="day-wed" role="tabpanel" aria-labelledby="tab-wed" hidden>
+    <h2 class="section-title">Wednesday · Last morning</h2>
+    <p class="section-sub">Slow morning, then the flight sets the pace.</p>
+
+    <div class="deadline">
+      <h3>✈ Non-negotiables</h3>
+      <ol>
+        <li>Bags collected from the hotel by <b>13:45</b></li>
+        <li>At Amsterdam Centraal around <b>14:00</b></li>
+        <li>At Schiphol by <b>14:45–15:00</b></li>
+        <li>Flight departs <b>17:00</b></li>
+      </ol>
+    </div>
+
+    <div class="timeline" id="tl-wed"></div>
+
+    <div class="surprise" id="surprise" role="button" tabindex="0">
+      <div class="lock">
+        <div style="font-size:1.6rem">🔒</div>
+        <h3>A little note for the airport</h3>
+        <p>Opens once we're at Schiphol</p>
+      </div>
+      <div class="msg">
+        <div style="font-size:1.6rem">🌷</div>
+        <h3>Tot de volgende keer, Amsterdam</h3>
+        <p>Croissants in Paris, stroopwafels in Amsterdam — every city is better because you're next to me. Thank you for another perfect Tedventure. Next stop: wherever you want, baboon. I love you endlessly ❤</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-tools">
+    <button class="btn btn-ghost" id="resetBtn" type="button">Reset checklist</button>
+  </div>
+  <p class="foot">Walking distances and times are rough estimates, not live routes. Tap a map link for real directions.</p>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =========================================================
+   EDITABLE DATA
+   Times are Amsterdam local (CET, UTC+01:00 in November).
+   ========================================================= */
+const TZ_OFFSET = '+01:00';
+const DATES = { tue: '2026-11-03', wed: '2026-11-04' };
+
+const PLACES = {
+  hotel:    { name: 'NH Collection Amsterdam Barbizon Palace', addr: 'Prins Hendrikkade 59-72, Amsterdam' },
+  haarlem:  { name: 'Haarlemmerstraat',  addr: 'Haarlemmerstraat 25, Amsterdam' },
+  brouwers: { name: 'Brouwersgracht',    addr: 'Brouwersgracht 60, Amsterdam' },
+  nine:     { name: 'De Negen Straatjes', addr: 'Huidenstraat 15, Amsterdam' },
+  flagship: { name: 'Flagship Waffle Experience', addr: 'Bloemgracht 2H, Amsterdam' },
+  jottum:   { name: 'Jottum', addr: 'Eerste Anjeliersdwarsstraat 17, Amsterdam' },
+  annefrank:{ name: 'Anne Frank House', addr: 'Westermarkt 20, Amsterdam' },
+  pure:     { name: 'Pure Boats (possible boarding)', addr: 'Keizersgracht 106, Amsterdam' },
+  centraal: { name: 'Amsterdam Centraal', addr: 'Amsterdam Centraal Station, Amsterdam' },
+  schiphol: { name: 'Amsterdam Schiphol', addr: 'Amsterdam Airport Schiphol' }
+};
+
+// Approximate walks. 'via' adds Google Maps waypoints. All figures are estimates.
+const WALKS = {
+  'hotel>haarlem':     { m: 700,  min: 9 },
+  'haarlem>brouwers':  { m: 500,  min: 7 },
+  'brouwers>nine':     { m: 1000, min: 13 },
+  'nine>flagship':     { m: 800,  min: 11 },
+  'brouwers>flagship': { m: 900,  min: 12, rough: true },
+  'hotel>flagship':    { m: 2000, min: 27, rough: true, via: ['haarlem', 'brouwers'] },
+  'flagship>jottum':   { m: 550,  min: 7 },
+  'jottum>annefrank':  { m: 650,  min: 9 },
+  'annefrank>hotel':   { m: 1500, min: 20, rough: true },
+  'hotel>pure':        { m: 1200, min: 15, rough: true },
+  'pure>hotel':        { m: 1200, min: 15, rough: true },
+  'hotel>centraal':    { m: 300,  min: 5, rough: true }
+};
+
+// Tuesday plan per arrival time: [placeKey, minutes to linger]
+const ARRIVAL_PLANS = {
+  '12:00': { stops: [['haarlem', 30], ['brouwers', 30], ['nine', 60]],
+             note: 'Lots of time: all three neighbourhoods, with spare time for a coffee and stroopwafel before the workshop.' },
+  '13:00': { stops: [['haarlem', 25], ['brouwers', 25], ['nine', 45]],
+             note: 'Full route at an easy pace. Skip Nine Streets if your legs say no.' },
+  '14:00': { stops: [['haarlem', 20], ['brouwers', 20]],
+             note: 'Nine Streets skipped today. It is a nice option for Wednesday lunch.' },
+  '15:00': { stops: [],
+             note: 'Straight to Bloemgracht. The walk passes Haarlemmerstraat and Brouwersgracht anyway, so enjoy them on the way.' }
+};
+const LUGGAGE_DROP_MIN = 15;
+const WORKSHOP_TARGET = '16:00';
+
+const STOP_INFO = {
+  haarlem:  { title: 'Haarlemmerstraat', desc: 'Independent shops, bakeries and cafés. A good street for the first browse.', ideas: ['Pop into whatever bakery smells best', 'Lots of small design and food shops'] },
+  brouwers: { title: 'Brouwersgracht', desc: 'One of the prettiest canals: houseboats, bridges, warehouse gables. Prime photo spot.', ideas: ['Bridge photos looking down the canal', 'Quiet, perfect for a slow walk'] },
+  nine:     { title: 'De Negen Straatjes · Nine Streets', desc: 'Boutiques, cafés and picture-perfect canal crossings. Optional if late or tired.', ideas: ['Boutique and vintage shopping', 'Cosy café break before the workshop'] }
+};
+
+const TUE_FIXED = [
+  { id: 'tue-workshop', place: 'flagship', start: '16:15', end: '17:00', status: 'confirmed', title: 'Stroopwafel workshop',
+    desc: 'Make and decorate our own Dutch stroopwafels together. Aim to arrive by 16:00.',
+    details: ['Duration about 45 minutes', 'Listed from €20.99 per person (€41.98 for two) before fees', 'Arrive by 16:00'],
+    link: { text: 'Booking page', url: 'https://flagshipamsterdam.com/experiences/the-flagship-waffle-experience/' } },
+  { id: 'tue-dinner', place: 'jottum', start: '17:30', end: '18:30', status: 'confirmed', title: 'Dinner at Jottum',
+    desc: 'Mediterranean tapas and sharing dishes in a cosy, relaxed spot. Table for 2 at 17:30.',
+    details: ['⚠ Dietary: no seafood, fish or seaweed, no lamb, no truffle (tell the server)', 'Aim to finish around 18:30 for Anne Frank House', 'Party of 2'],
+    link: { text: 'Restaurant (OpenTable)', url: 'https://www.opentable.com/r/jottum-amsterdam' } },
+  { id: 'tue-annefrank', place: 'annefrank', start: '19:00', end: '20:15', status: 'confirmed', title: 'Anne Frank House',
+    desc: 'Timed entry at 19:00. Arrive by 18:45. Expect 60–75 minutes inside.',
+    details: ['Target arrival 18:45', 'Visit roughly 60–75 minutes', 'Party of 2 (assumed)'],
+    link: { text: 'Official website', url: 'https://www.annefrank.org/' } },
+  { id: 'tue-evening', place: null, start: '20:15', end: '23:00', status: 'optional', title: 'Evening, our way',
+    desc: 'No bookings, no plan. Just follow the mood.',
+    ideas: [
+      ['Canal walk at night', 'Prinsengracht and Keizersgracht with the bridge lights. Very romantic.'],
+      ['Casual cocktail bar', 'Find a cosy brown café or cocktail spot nearby.'],
+      ['Dessert stop', 'One more stroopwafel? Always yes.'],
+      ['Slow walk back', 'Head toward the hotel when we feel like it.']
+    ] },
+  { id: 'tue-home', place: 'hotel', start: '', end: '', status: 'optional', title: 'Back to the hotel', from: 'annefrank',
+    desc: 'Whenever we are ready. Roughly 20 minutes on foot from Westermarkt.' }
+];
+
+const WED = [
+  { id: 'wed-checkout', place: 'hotel', start: '09:00', end: '10:00', status: 'confirmed', title: 'Breakfast & checkout',
+    desc: 'Slow breakfast, pack up, check out and leave the bags with the hotel.',
+    details: ['Ask the front desk to store our luggage until about 13:15'] },
+  { id: 'wed-cruise', place: 'pure', start: '10:30', end: '11:45', status: 'tentative', title: 'Winter canal cruise (maybe)', from: 'hotel',
+    desc: 'Pure Boats small-group winter cruise: covered, heated boat, one drink included, about 75 minutes. Not booked.',
+    warn: 'The 10:30 sailing we saw was for <strong>Tuesday 3 Nov</strong>, not Wednesday. Wednesday availability, price and boarding point are <strong>not confirmed</strong>. Check before going.',
+    details: ['Indicative ~€42.98 per person (Tuesday listing)', 'Boarding may be Keizersgracht 106, depending on sailing', 'Ends ~11:45, leaving plenty of time before luggage pickup'],
+    link: { text: 'Check & book', url: 'https://pureboats.com/cruises/small-group-tours/winter-cruise-amsterdam/' } },
+  { id: 'wed-lunch', place: null, start: '12:00', end: '13:15', status: 'optional', title: 'Lunch & final stroll',
+    desc: 'Last wander through central Amsterdam. Stay within about 15 minutes of the hotel.',
+    ideas: [
+      ['Final stroopwafel', 'A warm one for the road. Non-negotiable.'],
+      ['Nine Streets', 'If we skipped it Tuesday and are already close by.'],
+      ['Easy lunch', 'Something relaxed near the centre, then head back by 13:15.']
+    ] },
+  { id: 'wed-bags', place: 'hotel', start: '13:15', end: '13:45', status: 'planned', title: 'Collect luggage', from: 'pure',
+    desc: 'Back at the hotel to collect our bags. Do not push this later.' },
+  { id: 'wed-train', place: 'centraal', start: '14:00', end: '', status: 'planned', title: 'Train to Schiphol', from: 'hotel',
+    desc: 'From Amsterdam Centraal. Check the NS app for the next direct train. Times are not listed here.',
+    link: { text: 'NS journey planner', url: 'https://www.ns.nl/en/journeyplanner' } },
+  { id: 'wed-airport', place: 'schiphol', start: '14:45', end: '15:00', status: 'planned', title: 'Arrive at Schiphol',
+    desc: 'Target arrival window for check-in and security.' },
+  { id: 'wed-flight', place: 'schiphol', start: '17:00', end: '', status: 'confirmed', title: 'Flight departs ✈',
+    desc: 'Time to fly home.' }
+];
+
+const SURPRISE_UNLOCK = `${DATES.wed}T14:45:00${TZ_OFFSET}`;
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const enc = encodeURIComponent;
+const toMin = hm => { const [h, m] = hm.split(':').map(Number); return h * 60 + m; };
+const toHM = min => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
+const at = (day, hm) => new Date(`${DATES[day]}T${hm}:00${TZ_OFFSET}`);
+const placeQ = k => `${PLACES[k].name}, ${PLACES[k].addr}`;
+const mapsSearch = k => `https://www.google.com/maps/search/?api=1&query=${enc(placeQ(k))}`;
+function mapsDir(from, to, via = []) {
+  let u = `https://www.google.com/maps/dir/?api=1&origin=${enc(placeQ(from))}&destination=${enc(placeQ(to))}&travelmode=walking`;
+  if (via.length) u += `&waypoints=${enc(via.map(placeQ).join('|'))}`;
+  return u;
+}
+const walkOf = (a, b) => WALKS[`${a}>${b}`] || null;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+let done = store.get('ams-done', {});
+let arrival = store.get('ams-arrival', '13:00');
+if (!ARRIVAL_PLANS[arrival]) arrival = '13:00';
+
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* =========================================================
+   BUILD TUESDAY EVENTS (depends on arrival)
+   ========================================================= */
+function buildTuesday() {
+  const plan = ARRIVAL_PLANS[arrival];
+  const evs = [];
+  let t = toMin(arrival);
+  evs.push({ id: 'tue-arrive', place: 'hotel', start: arrival, end: toHM(t + LUGGAGE_DROP_MIN), status: 'flexible',
+    title: 'Arrive & drop luggage', desc: 'Coming from Eindhoven. Arrival time is flexible, so pick it above and the route adapts.',
+    details: ['Hotel: NH Collection Amsterdam Barbizon Palace', 'Next to Amsterdam Centraal'] });
+  t += LUGGAGE_DROP_MIN;
+  let prev = 'hotel';
+  for (const [key, linger] of plan.stops) {
+    const w = walkOf(prev, key); t += w.min;
+    const info = STOP_INFO[key];
+    evs.push({ id: `tue-${key}`, place: key, start: toHM(t), end: toHM(t + linger), status: 'optional', from: prev,
+      title: info.title, desc: info.desc, details: [`Suggested: about ${linger} min`, ...info.ideas] });
+    t += linger; prev = key;
+  }
+  const w = walkOf(prev, 'flagship'); t += w.min;
+  const slack = toMin(WORKSHOP_TARGET) - t;
+  const fixed = TUE_FIXED.map(e => ({ ...e }));
+  fixed[0].from = prev;
+  fixed[0].eta = `Estimated arrival ~${toHM(t)}` + (slack >= 15 ? ` · ~${slack} min to spare for a café stop` : slack >= 0 ? ' · right on target' : ' · tight, skip detours');
+  fixed[1].from = 'flagship'; fixed[2].from = 'jottum';
+  return { evs: evs.concat(fixed), note: plan.note };
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+const STATUS_LABEL = { confirmed: 'Confirmed', planned: 'Planned', optional: 'Optional', tentative: 'Tentative · not booked', flexible: 'Flexible' };
+
+function walkHTML(from, to, optional) {
+  const w = walkOf(from, to);
+  if (!w) return '';
+  const via = (w.via || []);
+  const viaTxt = via.length ? ` via ${via.map(k => PLACES[k].name).join(' & ')}` : '';
+  const dist = w.m >= 1000 ? `${(w.m / 1000).toFixed(1)} km` : `${w.m} m`;
+  return `<div class="walk${optional ? ' opt' : ''}">
+    <span class="icon" aria-hidden="true">🚶</span>
+    <span class="info"><b>≈ ${dist} · ~${w.min} min</b>${viaTxt}${w.rough ? ' <i>(rough)</i>' : ''}</span>
+    <a href="${mapsDir(from, to, via)}" target="_blank" rel="noopener" aria-label="Walking directions to ${esc(PLACES[to].name)}">Directions</a>
+  </div>`;
+}
+
+function cardHTML(e) {
+  const p = e.place ? PLACES[e.place] : null;
+  const time = e.start ? `${e.start}${e.end ? `<small>– ${e.end}</small>` : ''}` : `<small>Later</small>`;
+  const details = (e.details || []).map(d => `<li>${esc(d)}</li>`).join('');
+  const ideas = (e.ideas || []).map(([h, d]) => `<div class="idea"><b>${esc(h)}</b>${esc(d)}</div>`).join('');
+  const optional = e.status === 'optional' || e.status === 'tentative';
+  return `<article class="card${optional ? ' optional' : ''}${done[e.id] ? ' done' : ''}" id="${e.id}" data-id="${e.id}">
+    <div class="time">${time}</div>
+    <div class="body">
+      <span class="badge b-${e.status}">${STATUS_LABEL[e.status]}</span>
+      <h3>${esc(e.title)}</h3>
+      ${p ? `<p class="addr">${esc(p.name)} · ${esc(p.addr)}</p>` : ''}
+      <p class="desc">${esc(e.desc)}</p>
+      ${e.eta ? `<p class="desc" style="margin-top:6px;color:var(--terra);font-weight:600">${esc(e.eta)}</p>` : ''}
+      ${e.warn ? `<div class="warn">${e.warn}</div>` : ''}
+      ${ideas ? `<div class="ideas">${ideas}</div>` : ''}
+      ${details ? `<details><summary>Details</summary><ul>${details}</ul></details>` : ''}
+      <div class="actions">
+        ${p ? `<a class="btn btn-nav" href="${mapsSearch(e.place)}" target="_blank" rel="noopener">📍 Open in Maps</a>` : ''}
+        ${e.link ? `<a class="btn btn-ghost" href="${e.link.url}" target="_blank" rel="noopener">${esc(e.link.text)} ↗</a>` : ''}
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" ${done[e.id] ? 'checked' : ''} aria-label="Mark ${esc(e.title)} as done"></label>
+  </article>`;
+}
+
+function renderTimeline(el, evs) {
+  let html = '';
+  evs.forEach((e, i) => {
+    if (i > 0 && e.from && e.place) html += walkHTML(e.from, e.place, e.status === 'optional' || e.status === 'tentative');
+    else if (i > 0) html += '<div class="walk" style="min-height:22px"></div>';
+    html += cardHTML(e);
+  });
+  el.innerHTML = html;
+}
+
+let ALL = [];
+function render() {
+  const tue = buildTuesday();
+  $('#planNote').textContent = tue.note;
+  $('#arrivalChips').innerHTML = Object.keys(ARRIVAL_PLANS).map(hm =>
+    `<button class="chip" type="button" data-hm="${hm}" aria-pressed="${hm === arrival}">${hm}</button>`).join('');
+  renderTimeline($('#tl-tue'), tue.evs);
+  renderTimeline($('#tl-wed'), WED);
+
+  // Full Tuesday route: hotel -> stops -> workshop -> dinner -> Anne Frank
+  const stops = ARRIVAL_PLANS[arrival].stops.map(s => s[0]);
+  const via = stops.length ? stops : ['haarlem', 'brouwers'];
+  $('#fullRouteTue').href = mapsDir('hotel', 'annefrank', [...via, 'flagship', 'jottum']);
+
+  ALL = [
+    ...tue.evs.filter(e => e.start).map(e => ({ ...e, day: 'tue' })),
+    ...WED.map(e => ({ ...e, day: 'wed' }))
+  ].map(e => ({ ...e, s: at(e.day, e.start), en: at(e.day, e.end || toHM(toMin(e.start) + 30)) }));
+  // Keep only events currently shown for checklist/progress
+  updateSmart();
+}
+
+/* =========================================================
+   SMART "NEXT UP"
+   ========================================================= */
+function fmtDur(ms) {
+  const m = Math.max(0, Math.round(ms / 60000));
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60), r = m % 60;
+  return h >= 24 ? `${Math.floor(h / 24)}d ${h % 24}h` : `${h}h ${String(r).padStart(2, '0')}m`;
+}
+
+let nextId = null;
+function updateSmart() {
+  const now = new Date();
+  const counted = ALL.filter(e => e.status !== 'optional');
+  const doneCount = ALL.filter(e => done[e.id]).length;
+  $('#progTxt').textContent = `${doneCount}/${ALL.length} done`;
+  $('#progBar').style.width = `${ALL.length ? (doneCount / ALL.length) * 100 : 0}%`;
+
+  // Next = first non-done, non-optional event that hasn't ended
+  const next = counted.find(e => !done[e.id] && e.en > now);
+  document.querySelectorAll('.card.next-up').forEach(c => c.classList.remove('next-up', 'now'));
+  if (!next) {
+    nextId = null;
+    $('#nextLbl').textContent = 'All done';
+    $('#nextWhat').textContent = 'Tedventure complete ❤';
+    $('#nextWhen').textContent = '';
+  } else {
+    nextId = next.id;
+    const running = now >= next.s;
+    $('#nextLbl').textContent = running ? 'Happening now' : `Next · ${next.day === 'tue' ? 'Tue' : 'Wed'} ${next.start}`;
+    $('#nextWhat').textContent = next.title;
+    $('#nextWhen').textContent = running ? (next.end ? `until ${next.end}` : 'now') : `in ${fmtDur(next.s - now)}`;
+    const card = document.getElementById(next.id);
+    if (card) { card.classList.add('next-up'); if (running) card.classList.add('now'); }
+  }
+
+  // Surprise unlock
+  const s = $('#surprise');
+  if (now >= new Date(SURPRISE_UNLOCK) || done['wed-airport']) s.classList.add('open');
+}
+
+/* =========================================================
+   TABS & EVENTS
+   ========================================================= */
+function showDay(day) {
+  ['tue', 'wed'].forEach(d => {
+    $(`#tab-${d}`).setAttribute('aria-selected', d === day);
+    $(`#day-${d}`).hidden = d !== day;
+  });
+}
+$('#tab-tue').addEventListener('click', () => showDay('tue'));
+$('#tab-wed').addEventListener('click', () => showDay('wed'));
+
+$('#arrivalChips').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  arrival = b.dataset.hm; store.set('ams-arrival', arrival); render();
+  toast(`Plan updated for ${arrival} arrival`);
+});
+
+document.addEventListener('change', e => {
+  if (!e.target.matches('.check input')) return;
+  const card = e.target.closest('.card'); const id = card.dataset.id;
+  if (e.target.checked) done[id] = true; else delete done[id];
+  card.classList.toggle('done', e.target.checked);
+  store.set('ams-done', done); updateSmart();
+});
+
+$('#nextBox').addEventListener('click', () => {
+  if (!nextId) return;
+  const ev = ALL.find(e => e.id === nextId);
+  showDay(ev.day);
+  const el = document.getElementById(nextId);
+  if (el) { const y = el.getBoundingClientRect().top + window.scrollY - 190; window.scrollTo({ top: y, behavior: 'smooth' }); }
+});
+
+$('#resetBtn').addEventListener('click', () => {
+  if (!confirm('Clear all ticks?')) return;
+  done = {}; store.set('ams-done', done); render();
+});
+
+function trySurprise() {
+  const s = $('#surprise');
+  if (!s.classList.contains('open')) toast('Patience, babyboooon 🥰 it opens at Schiphol');
+}
+$('#surprise').addEventListener('click', trySurprise);
+$('#surprise').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); trySurprise(); } });
+
+// Secret: hold the title for 3s to peek at the airport note early
+(function () {
+  const h = $('#title'); let tmr = null;
+  const start = e => { e.preventDefault(); h.style.opacity = '.6'; h.style.transform = 'scale(.97)';
+    tmr = setTimeout(() => { $('#surprise').classList.add('open'); showDay('wed'); $('#surprise').scrollIntoView({ behavior: 'smooth' }); end(); }, 3000); };
+  const end = () => { h.style.opacity = ''; h.style.transform = ''; clearTimeout(tmr); };
+  h.addEventListener('touchstart', start, { passive: false }); h.addEventListener('mousedown', start);
+  ['touchend', 'touchcancel', 'mouseup', 'mouseleave'].forEach(ev => h.addEventListener(ev, end));
+})();
+
+/* =========================================================
+   SKYLINE: canal-house gables
+   ========================================================= */
+(function skyline() {
+  const svg = $('#skyline'); const W = 400, H = 86;
+  const fills = ['#2c3c5e', '#34466b', '#26355a', '#3a4d74'];
+  let x = 0, i = 0, out = '';
+  const pattern = ['step', 'neck', 'spout', 'bell', 'step', 'spout', 'neck', 'step', 'bell'];
+  while (x < W) {
+    const w = 34 + ((i * 7) % 14), top = 22 + ((i * 13) % 22), type = pattern[i % pattern.length];
+    const f = fills[i % fills.length], r = x + w, m = x + w / 2;
+    let d = `M${x},${H} V${top + 14} `;
+    if (type === 'step') d += `H${x + 5} V${top + 8} H${x + 10} V${top + 2} H${m - 5} V${top - 4} H${m + 5} V${top + 2} H${r - 10} V${top + 8} H${r - 5} V${top + 14} `;
+    else if (type === 'neck') d += `H${x + 6} V${top + 6} H${m - 7} V${top - 2} Q${m},${top - 9} ${m + 7},${top - 2} V${top + 6} H${r - 6} V${top + 14} `;
+    else if (type === 'bell') d += `Q${x + 4},${top + 2} ${m},${top - 4} Q${r - 4},${top + 2} ${r},${top + 14} `;
+    else d += `L${m - 4},${top} H${m + 4} L${r},${top + 14} `;
+    d += `H${r} V${H} Z`;
+    out += `<path d="${d}" fill="${f}"/>`;
+    // windows
+    for (let row = 0; row < 3; row++) {
+      const wy = top + 22 + row * 16; if (wy > H - 10) break;
+      for (let c = 0; c < 2; c++) {
+        const lit = (i + row + c) % 5 === 0;
+        out += `<rect x="${x + 7 + c * (w / 2 - 2)}" y="${wy}" width="${w / 2 - 12}" height="9" rx="1.5" fill="${lit ? '#e8c472' : '#f7f0e3'}" opacity="${lit ? 0.9 : 0.16}"/>`;
+      }
+    }
+    x += w + 1; i++;
+  }
+  svg.innerHTML = out;
+})();
+
+/* =========================================================
+   INIT
+   ========================================================= */
+render();
+// Open the right day automatically (Amsterdam date)
+(function () {
+  const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date());
+  showDay(ymd >= DATES.wed ? 'wed' : 'tue');
+})();
+setInterval(updateSmart, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) updateSmart(); });
+</script>
+</body>
+</html>
