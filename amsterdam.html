@@ -199,13 +199,14 @@
   <!-- WEDNESDAY -->
   <section class="day" id="day-wed" role="tabpanel" aria-labelledby="tab-wed" hidden>
     <h2 class="section-title">Wednesday · Last morning</h2>
-    <p class="section-sub">Slow morning, then the flight sets the pace.</p>
+    <p class="section-sub">Morning wander, a cruise at noon, then the flight sets the pace.</p>
 
     <div class="deadline">
       <h3>✈ Non-negotiables</h3>
       <ol>
-        <li>Bags collected from the hotel by <b>13:45</b></li>
-        <li>At Amsterdam Centraal around <b>14:00</b></li>
+        <li>Check out &amp; leave bags by <b>11:45</b></li>
+        <li>Bags collected from the hotel at <b>14:00</b></li>
+        <li>At Amsterdam Centraal around <b>14:15</b></li>
         <li>At Schiphol by <b>14:45–15:00</b></li>
         <li>Flight departs <b>17:00</b></li>
       </ol>
@@ -252,7 +253,7 @@ const PLACES = {
   flagship: { name: 'Flagship Waffle Experience', addr: 'Bloemgracht 2H, Amsterdam' },
   jottum:   { name: 'Jottum', addr: 'Eerste Anjeliersdwarsstraat 17, Amsterdam' },
   annefrank:{ name: 'Anne Frank House', addr: 'Westermarkt 20, Amsterdam' },
-  pure:     { name: 'Pure Boats (possible boarding)', addr: 'Keizersgracht 106, Amsterdam' },
+  cruise:   { name: 'Canal cruise boarding (near Centraal)', addr: 'Amsterdam Centraal Station, Amsterdam' },
   centraal: { name: 'Amsterdam Centraal', addr: 'Amsterdam Centraal Station, Amsterdam' },
   schiphol: { name: 'Amsterdam Schiphol', addr: 'Amsterdam Airport Schiphol' }
 };
@@ -268,8 +269,7 @@ const WALKS = {
   'flagship>jottum':   { m: 550,  min: 7 },
   'jottum>annefrank':  { m: 650,  min: 9 },
   'annefrank>hotel':   { m: 1500, min: 20, rough: true },
-  'hotel>pure':        { m: 1200, min: 15, rough: true },
-  'pure>hotel':        { m: 1200, min: 15, rough: true },
+  'hotel>cruise':      { m: 300,  min: 5, rough: true },
   'hotel>centraal':    { m: 300,  min: 5, rough: true }
 };
 
@@ -319,24 +319,30 @@ const TUE_FIXED = [
 ];
 
 const WED = [
-  { id: 'wed-checkout', place: 'hotel', start: '09:00', end: '10:00', status: 'confirmed', title: 'Breakfast & checkout',
-    desc: 'Slow breakfast, pack up, check out and leave the bags with the hotel.',
-    details: ['Ask the front desk to store our luggage until about 13:15'] },
-  { id: 'wed-cruise', place: 'pure', start: '10:30', end: '11:45', status: 'tentative', title: 'Winter canal cruise (maybe)', from: 'hotel',
-    desc: 'Pure Boats small-group winter cruise: covered, heated boat, one drink included, about 75 minutes. Not booked.',
-    warn: 'The 10:30 sailing we saw was for <strong>Tuesday 3 Nov</strong>, not Wednesday. Wednesday availability, price and boarding point are <strong>not confirmed</strong>. Check before going.',
-    details: ['Indicative ~€42.98 per person (Tuesday listing)', 'Boarding may be Keizersgracht 106, depending on sailing', 'Ends ~11:45, leaving plenty of time before luggage pickup'],
-    link: { text: 'Check & book', url: 'https://pureboats.com/cruises/small-group-tours/winter-cruise-amsterdam/' } },
-  { id: 'wed-lunch', place: null, start: '12:00', end: '13:15', status: 'optional', title: 'Lunch & final stroll',
-    desc: 'Last wander through central Amsterdam. Stay within about 15 minutes of the hotel.',
+  { id: 'wed-breakfast', place: 'hotel', start: '09:00', end: '09:30', status: 'confirmed', title: 'Breakfast',
+    desc: 'Last Amsterdam breakfast together. Keep it easy.' },
+  { id: 'wed-explore-am', place: null, start: '09:30', end: '11:30', status: 'planned', title: 'Morning exploration',
+    desc: 'Two hours to wander. Be back at the hotel by 11:30.',
     ideas: [
+      ['Nine Streets & Jordaan', 'Boutiques, canals and cafés, if we did not see them yesterday.'],
       ['Final Amsterdam brownie', 'One for the road. Non-negotiable.'],
-      ['Nine Streets', 'If we skipped it Tuesday and are already close by.'],
-      ['Easy lunch', 'Something relaxed near the centre, then head back by 13:15.']
+      ['Canal photos', 'Morning light on the canals is lovely.']
     ] },
-  { id: 'wed-bags', place: 'hotel', start: '13:15', end: '13:45', status: 'planned', title: 'Collect luggage', from: 'pure',
-    desc: 'Back at the hotel to collect our bags. Do not push this later.' },
-  { id: 'wed-train', place: 'centraal', start: '14:00', end: '', status: 'planned', title: 'Train to Schiphol', from: 'hotel',
+  { id: 'wed-checkout', place: 'hotel', start: '11:30', end: '11:45', status: 'planned', title: 'Pack up, check out & leave bags',
+    desc: 'Finish packing, check out by 11:45 and leave the luggage with the hotel.',
+    details: ['Ask the front desk to store our luggage until about 14:00'] },
+  { id: 'wed-cruise', place: 'cruise', start: '12:00', end: '13:00', status: 'confirmed', title: 'Wine & cheese canal cruise 🍷🧀', from: 'hotel',
+    desc: 'One hour on the canals with wine and cheese included. Leaves from near Amsterdam Centraal.',
+    details: ['Check the ticket for the exact boarding pier at Centraal', 'Aim to be at the pier by about 11:50'] },
+  { id: 'wed-explore-pm', place: null, start: '13:00', end: '14:00', status: 'planned', title: 'Last hour of exploring',
+    desc: 'One more hour. Stay within about 10 minutes of the hotel so we are back by 14:00.',
+    ideas: [
+      ['Damrak & Dam Square', 'Right next to Centraal and the hotel.'],
+      ['Quick bite', 'Something easy before the flight.']
+    ] },
+  { id: 'wed-bags', place: 'hotel', start: '14:00', end: '14:10', status: 'planned', title: 'Collect luggage & go',
+    desc: 'Pick up the bags and head straight to Centraal. Do not push this later.' },
+  { id: 'wed-train', place: 'centraal', start: '14:15', end: '', status: 'planned', title: 'Train to Schiphol', from: 'hotel',
     desc: 'From Amsterdam Centraal. Check the NS app for the next direct train. Times are not listed here.',
     link: { text: 'NS journey planner', url: 'https://www.ns.nl/en/journeyplanner' } },
   { id: 'wed-airport', place: 'schiphol', start: '14:45', end: '15:00', status: 'planned', title: 'Arrive at Schiphol',
