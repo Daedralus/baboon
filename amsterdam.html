@@ -148,7 +148,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <div class="eyebrow">3 – 4 November 2026</div>
+    <div class="eyebrow" id="eyebrow">3 – 4 November 2026<span id="ovDot" hidden>.</span></div>
     <h1 id="title">Amsterdam <span class="x">✕✕✕</span> Tedventure</h1>
     <p>Canals, Amsterdam brownies &amp; us · Europe/Amsterdam time</p>
   </div>
@@ -372,7 +372,8 @@ let done = store.get('ams-done', {});
 let forced = store.get('ams-forced', {});   // manually revealed early (hold the title)
 const REVEAL_LEAD_MIN = 30;
 const revealAt = (e, day) => { const hm = e.reveal || e.start; return hm ? new Date(at(day, hm) - REVEAL_LEAD_MIN * 60000) : null; };
-const isRevealed = (e, day, now = new Date()) => { if (forced[e.id]) return true; const r = revealAt(e, day); return !r || now >= r; };
+let ov = (() => { try { return sessionStorage.getItem('ams-ui') === '1'; } catch (e) { return false; } })();
+const isRevealed = (e, day, now = new Date()) => { if (ov || forced[e.id]) return true; const r = revealAt(e, day); return !r || now >= r; };
 let arrival = store.get('ams-arrival', '13:00');
 if (!ARRIVAL_PLANS[arrival]) arrival = '13:00';
 
@@ -654,6 +655,24 @@ $('#surprise').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key
 /* =========================================================
    INIT
    ========================================================= */
+// Quiet view: 7 quick taps on the date line, then the code. Same gesture turns it off.
+(function () {
+  const H = '7ef45737ddac485934ae911a6da811525324409b94e89cb6c67b066d7aaef772';
+  const dot = () => { $('#ovDot').hidden = !ov; };
+  const set = v => { ov = v; try { v ? sessionStorage.setItem('ams-ui', '1') : sessionStorage.removeItem('ams-ui'); } catch (e) {} dot(); render(); };
+  async function sha(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+  let taps = [];
+  $('#eyebrow').addEventListener('click', async () => {
+    const now = Date.now(); taps = taps.filter(t => now - t < 3000); taps.push(now);
+    if (taps.length < 7) return;
+    taps = [];
+    if (ov) return set(false);
+    const c = prompt('🌷');
+    if (!c || !window.crypto || !crypto.subtle) return;
+    try { if (await sha(c.trim()) === H) set(true); } catch (e) {}
+  });
+  dot();
+})();
 render();
 // Open the right day automatically (Amsterdam date)
 (function () {
