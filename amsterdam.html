@@ -83,6 +83,9 @@
   .card.next-up::before{ content:'Up next'; position:absolute; top:-10px; left:14px; background:var(--terra); color:#fff; font-size:0.68rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 8px; border-radius:6px; }
   .card.now::before{ content:'Happening now'; }
   .card.done{ opacity:0.55; }
+  .card.locked{ background:repeating-linear-gradient(135deg, #fffaf1 0 12px, #f7efdf 12px 24px); border:1.5px dashed #cdb98f; box-shadow:none; grid-template-columns:58px 1fr; }
+  .card.locked h3{ color:var(--navy-2); }
+  .b-locked{ background:var(--navy); color:var(--gold-soft); }
   .card.done h3{ text-decoration:line-through; text-decoration-color:var(--gold); }
   .time{ font-family:var(--serif); font-weight:700; color:var(--navy); font-size:1.1rem; line-height:1.15; }
   .time small{ display:block; font-family:var(--sans); font-weight:500; font-size:0.75rem; color:var(--muted); margin-top:2px; }
@@ -171,14 +174,14 @@
 <main class="wrap">
   <section class="note">
     <h2>Hi babyboooonnn ❤</h2>
-    <p>Welcome to our little Amsterdam companion. Same baguette magic as Paris, now with stroopwafel magic: it follows Amsterdam time and always shows what's next. Tick things off as we go, wander wherever looks cute, and no rushing (except for the plane). I love you so much, my Disney princess!</p>
+    <p>Welcome to our little Amsterdam companion. Same baguette magic as Paris, now with stroopwafel magic: every stop stays a secret until 30 minutes before it starts, so no peeking ahead. Tick things off as we go, wander wherever looks cute, and no rushing (except for the plane). I love you so much, my Disney princess!</p>
     <div class="sig">— your Ted</div>
   </section>
 
   <!-- TUESDAY -->
   <section class="day" id="day-tue" role="tabpanel" aria-labelledby="tab-tue">
     <h2 class="section-title">Tuesday · Explore &amp; stroopwafels</h2>
-    <p class="section-sub">Flexible afternoon, then three fixed points: workshop 16:15, dinner 17:30, Anne Frank House 19:00.</p>
+    <p class="section-sub">Each slot unlocks 30 minutes before it starts. Times are shown, everything else is a surprise.</p>
 
     <div class="panel">
       <h3>When do we reach the hotel?</h3>
@@ -272,13 +275,13 @@ const WALKS = {
 // Tuesday plan per arrival time: [placeKey, minutes to linger]
 const ARRIVAL_PLANS = {
   '12:00': { stops: [['haarlem', 30], ['brouwers', 30], ['nine', 60]],
-             note: 'Lots of time: all three neighbourhoods, with spare time for a coffee and stroopwafel before the workshop.' },
+             note: 'Lots of time: a long, slow wander before the first surprise.' },
   '13:00': { stops: [['haarlem', 25], ['brouwers', 25], ['nine', 45]],
-             note: 'Full route at an easy pace. Skip Nine Streets if your legs say no.' },
+             note: 'A relaxed wander at an easy pace before the first surprise.' },
   '14:00': { stops: [['haarlem', 20], ['brouwers', 20]],
-             note: 'Nine Streets skipped today. It is a nice option for Wednesday lunch.' },
+             note: 'A shorter wander so we are on time for the first surprise.' },
   '15:00': { stops: [],
-             note: 'Straight to Bloemgracht. The walk passes Haarlemmerstraat and Brouwersgracht anyway, so enjoy them on the way.' }
+             note: 'No detours: straight to the first surprise (a pretty walk anyway).' }
 };
 const LUGGAGE_DROP_MIN = 15;
 const WORKSHOP_TARGET = '16:00';
@@ -310,7 +313,7 @@ const TUE_FIXED = [
       ['Dessert stop', 'One more stroopwafel? Always yes.'],
       ['Slow walk back', 'Head toward the hotel when we feel like it.']
     ] },
-  { id: 'tue-home', place: 'hotel', start: '', end: '', status: 'optional', title: 'Back to the hotel', from: 'annefrank',
+  { id: 'tue-home', place: 'hotel', reveal: '20:15', start: '', end: '', status: 'optional', title: 'Back to the hotel', from: 'annefrank',
     desc: 'Whenever we are ready. Roughly 20 minutes on foot from Westermarkt.' }
 ];
 
@@ -366,6 +369,10 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 };
 let done = store.get('ams-done', {});
+let forced = store.get('ams-forced', {});   // manually revealed early (hold the title)
+const REVEAL_LEAD_MIN = 30;
+const revealAt = (e, day) => { const hm = e.reveal || e.start; return hm ? new Date(at(day, hm) - REVEAL_LEAD_MIN * 60000) : null; };
+const isRevealed = (e, day, now = new Date()) => { if (forced[e.id]) return true; const r = revealAt(e, day); return !r || now >= r; };
 let arrival = store.get('ams-arrival', '13:00');
 if (!ARRIVAL_PLANS[arrival]) arrival = '13:00';
 
@@ -446,12 +453,28 @@ function cardHTML(e) {
   </article>`;
 }
 
-function renderTimeline(el, evs) {
+function lockedHTML(e, day) {
+  const r = revealAt(e, day);
+  const rHM = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit' }).format(r);
+  const time = e.start ? `${e.start}${e.end ? `<small>– ${e.end}</small>` : ''}` : `<small>Later</small>`;
+  return `<article class="card locked" id="${e.id}" data-id="${e.id}">
+    <div class="time">${time}</div>
+    <div class="body">
+      <span class="badge b-locked">Surprise</span>
+      <h3>🔒 Hidden slot</h3>
+      <p class="desc">Unlocks at ${rHM}${day === 'wed' ? ' on Wednesday' : ''}.</p>
+    </div>
+  </article>`;
+}
+
+function renderTimeline(el, evs, day) {
+  const now = new Date();
   let html = '';
   evs.forEach((e, i) => {
-    if (i > 0 && e.from && e.place) html += walkHTML(e.from, e.place, e.status === 'optional' || e.status === 'tentative');
+    const open = isRevealed(e, day, now);
+    if (i > 0 && open && e.from && e.place) html += walkHTML(e.from, e.place, e.status === 'optional' || e.status === 'tentative');
     else if (i > 0) html += '<div class="walk" style="min-height:22px"></div>';
-    html += cardHTML(e);
+    html += open ? cardHTML(e) : lockedHTML(e, day);
   });
   el.innerHTML = html;
 }
@@ -462,13 +485,19 @@ function render() {
   $('#planNote').textContent = tue.note;
   $('#arrivalChips').innerHTML = Object.keys(ARRIVAL_PLANS).map(hm =>
     `<button class="chip" type="button" data-hm="${hm}" aria-pressed="${hm === arrival}">${hm}</button>`).join('');
-  renderTimeline($('#tl-tue'), tue.evs);
-  renderTimeline($('#tl-wed'), WED);
+  renderTimeline($('#tl-tue'), tue.evs, 'tue');
+  renderTimeline($('#tl-wed'), WED, 'wed');
+  revealSig = signature();
 
-  // Full Tuesday route: hotel -> stops -> workshop -> dinner -> Anne Frank
-  const stops = ARRIVAL_PLANS[arrival].stops.map(s => s[0]);
-  const via = stops.length ? stops : ['haarlem', 'brouwers'];
-  $('#fullRouteTue').href = mapsDir('hotel', 'annefrank', [...via, 'flagship', 'jottum']);
+  // Tuesday route so far: only places already revealed (no spoilers)
+  const places = [];
+  tue.evs.filter(e => e.place && e.id !== 'tue-home' && isRevealed(e, 'tue')).forEach(e => { if (places[places.length - 1] !== e.place) places.push(e.place); });
+  const rb = $('#fullRouteTue');
+  if (places.length >= 2) {
+    rb.hidden = false;
+    rb.href = mapsDir(places[0], places[places.length - 1], places.slice(1, -1));
+    rb.textContent = places.length === tue.evs.filter(e => e.place && e.id !== 'tue-home').length ? '🗺 Full Tuesday route' : '🗺 Route so far';
+  } else rb.hidden = true;
 
   ALL = [
     ...tue.evs.filter(e => e.start).map(e => ({ ...e, day: 'tue' })),
@@ -489,8 +518,12 @@ function fmtDur(ms) {
 }
 
 let nextId = null;
+let revealSig = '';
+const signature = () => { const now = new Date(); return ALL_SRC().map(([e, d]) => isRevealed(e, d, now) ? 1 : 0).join(''); };
+const ALL_SRC = () => [...buildTuesday().evs.map(e => [e, 'tue']), ...WED.map(e => [e, 'wed'])];
 function updateSmart() {
   const now = new Date();
+  if (ALL.length && signature() !== revealSig) { render(); return; }
   const counted = ALL.filter(e => e.status !== 'optional');
   const doneCount = ALL.filter(e => done[e.id]).length;
   $('#progTxt').textContent = `${doneCount}/${ALL.length} done`;
@@ -508,7 +541,8 @@ function updateSmart() {
     nextId = next.id;
     const running = now >= next.s;
     $('#nextLbl').textContent = running ? 'Happening now' : `Next · ${next.day === 'tue' ? 'Tue' : 'Wed'} ${next.start}`;
-    $('#nextWhat').textContent = next.title;
+    const open = isRevealed(next, next.day, now);
+    $('#nextWhat').textContent = open ? next.title : '🔒 Surprise';
     $('#nextWhen').textContent = running ? (next.end ? `until ${next.end}` : 'now') : `in ${fmtDur(next.s - now)}`;
     const card = document.getElementById(next.id);
     if (card) { card.classList.add('next-up'); if (running) card.classList.add('now'); }
@@ -554,8 +588,8 @@ $('#nextBox').addEventListener('click', () => {
 });
 
 $('#resetBtn').addEventListener('click', () => {
-  if (!confirm('Clear all ticks?')) return;
-  done = {}; store.set('ams-done', done); render();
+  if (!confirm('Clear all ticks and re-hide early sneak peeks?')) return;
+  done = {}; forced = {}; store.set('ams-done', done); store.set('ams-forced', forced); render();
 });
 
 function trySurprise() {
@@ -565,11 +599,22 @@ function trySurprise() {
 $('#surprise').addEventListener('click', trySurprise);
 $('#surprise').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); trySurprise(); } });
 
-// Secret: hold the title for 3s to peek at the airport note early
+// Secret: hold the title for 3s to reveal the next hidden slot early (like Paris)
 (function () {
   const h = $('#title'); let tmr = null;
   const start = e => { e.preventDefault(); h.style.opacity = '.6'; h.style.transform = 'scale(.97)';
-    tmr = setTimeout(() => { $('#surprise').classList.add('open'); showDay('wed'); $('#surprise').scrollIntoView({ behavior: 'smooth' }); end(); }, 3000); };
+    tmr = setTimeout(() => {
+      end();
+      const nxt = ALL_SRC().find(([ev, d]) => !isRevealed(ev, d));
+      if (nxt) {
+        forced[nxt[0].id] = true; store.set('ams-forced', forced); render(); showDay(nxt[1]);
+        const el = document.getElementById(nxt[0].id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast('Sneak peek unlocked 👀');
+      } else {
+        $('#surprise').classList.add('open'); showDay('wed'); $('#surprise').scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 3000); };
   const end = () => { h.style.opacity = ''; h.style.transform = ''; clearTimeout(tmr); };
   h.addEventListener('touchstart', start, { passive: false }); h.addEventListener('mousedown', start);
   ['touchend', 'touchcancel', 'mouseup', 'mouseleave'].forEach(ev => h.addEventListener(ev, end));
